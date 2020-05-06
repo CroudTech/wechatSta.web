@@ -1,4 +1,6 @@
-export const host = 'http://wxstaapi.ayioz.com'
+// hack
+export const host = 'https://wechat-data-exporter.croud.tech'
+
 export const auth = '/auth'
 export const authchk = '/auth/chk'
 export const login = '/auth/login'

@@ -1,0 +1,87 @@
+clone:
+  git:
+    image: plugins/git
+    tags: true
+pipeline:
+  docker-login:
+    group: pre_build
+    image: croudtech/docker-aws:latest
+    pull: true
+    privileged: true
+    commands:
+    - eval $(aws ecr get-login --no-include-email --region eu-west-2)
+    - docker pull 245542037479.dkr.ecr.eu-west-2.amazonaws.com/devops/deployment-worker:latest
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  setup-image-tag:
+    image: croudtech/drone-pipeline-setup:latest
+    pull: true
+    privileged: true
+    environment:
+    - DOCKER_REPO=245542037479.dkr.ecr.eu-west-2.amazonaws.com/croudtech-agency/wechat-data-extractor
+    - PROTECTED_FILES_LOCATION=/public/protected-files
+    - PUBLIC_FOLDER=/public
+    when:
+      event:
+      - tag
+      - push
+  publish-ecr:
+    image: croudtech/drone-docker-ecr:latest
+    repo: 245542037479.dkr.ecr.eu-west-2.amazonaws.com/croudtech-agency/wechat-data-extractor
+    registry: 245542037479.dkr.ecr.eu-west-2.amazonaws.com
+    region: eu-west-2
+    pull: true
+    skip_untagged: true
+    privileged: true
+    when:
+      event:
+      - tag
+      - push
+  promote-stg-agency-iwg:
+    image: 245542037479.dkr.ecr.eu-west-2.amazonaws.com/devops/deployment-worker:latest
+    pull: true
+    privileged: true
+    when:
+      event: deployment
+      environment: blue
+    environment:
+    - REPO=245542037479.dkr.ecr.eu-west-2.amazonaws.com/croudtech-agency/wechat-data-extractor
+    - APP=wechat-data-extractor
+    - NAMESPACE=stg-agency-iwg
+    - CHART=croudtech-stable/croudtech-simple
+    - COLOUR=${DRONE_DEPLOY_TO}
+    commands:
+    - /scripts/tag-deploy.sh ${DRONE_TAG}
+  deploy-int-agency-iwg:
+    image: 245542037479.dkr.ecr.eu-west-2.amazonaws.com/devops/deployment-worker:latest
+    pull: true
+    privileged: true
+    when:
+      branch: integration
+      event:
+      - push
+    environment:
+    - REPO=245542037479.dkr.ecr.eu-west-2.amazonaws.com/croudtech-agency/wechat-data-extractor
+    - APP=wechat-data-extractor
+    - DEFAULT_NAMESPACE=int-agency-iwg
+    - CHART=croudtech-stable/croudtech-simple
+    - COLOUR=blue
+    commands:
+    - /scripts/tag-deploy.sh integration
+  nightly-stg-agency-iwg:
+    image: 245542037479.dkr.ecr.eu-west-2.amazonaws.com/devops/deployment-worker:latest
+    pull: true
+    privileged: true
+    when:
+      tags:
+      - nightly-*
+      event:
+      - tag
+    environment:
+    - REPO=245542037479.dkr.ecr.eu-west-2.amazonaws.com/croudtech-agency/wechat-data-extractor
+    - APP=wechat-data-extractor
+    - DEFAULT_NAMESPACE=stg-agency-iwg
+    - CHART=croudtech-stable/croudtech-simple
+    - COLOUR=blue
+    commands:
+    - /scripts/tag-deploy.sh ${DRONE_TAG}
