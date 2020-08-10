@@ -4,8 +4,6 @@ import NotFound from './404'
 import WeChat from './pages/WeChat'
 import Fans from './pages/Fans'
 import Article from './pages/Article'
-import Login from './pages/Login'
-import Reg from './pages/Reg'
 import Profile from './pages/Profile'
 import WxOnline from './pages/WxOnline'
 
@@ -22,5 +20,3 @@ export const root = {
     component: App,
     children: [welcome, wechat, fans, article, profile, wxonline, notfound]
 }
-export const login = { path: '/login', component: Login }
-export const reg = { path: '/reg', component: Reg }

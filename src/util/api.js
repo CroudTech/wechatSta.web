@@ -1,15 +1,8 @@
-// hack
-export const host = 'https://wechat-data-exporter.croud.tech'
-
+export const host = process.env.REACT_APP_API_HOST
 export const auth = '/auth'
-export const authchk = '/auth/chk'
-export const login = '/auth/login'
-export const register = '/auth/reg'
-export const pwd = '/auth/pwd'
 export const wechat = '/wechat'
 export const wechatall = '/wechat/all'
 export const wechatstatus = '/wechat/status'
-export const wechatmail = '/wechat/mail'
 export const wxsta = '/wxsta'
 export const fans = '/fans'
 export const fansxlsx = '/fans/xlsx'
@@ -18,5 +11,4 @@ export const articlexlsx = '/article/xlsx'
 export const articlel7 = '/article/l7'
 export const articleexttotal = '/article/ext/total'
 export const articleextdetail = '/article/ext/detail'
-export const smtp = '/smtp'
 export const wxonline = '/wxonline'

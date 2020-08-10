@@ -1,5 +1,4 @@
 import { message } from 'antd'
-import { login, reg } from '../router'
 
 message.config({
     top: 100,
@@ -18,11 +17,6 @@ const codeHandler = {
 }
 
 const codeCallbackHandler = {
-    401: () => {
-        const path = window.location.pathname.toLowerCase()
-        if (path !== login.path && path !== reg.path)
-            window.location = login.path
-    }
 }
 
 export default (code, t = 'info', m = '') => {

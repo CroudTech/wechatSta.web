@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { Card, Descriptions, Modal, Form, Button, Input, Affix } from 'antd'
 import {
     CheckOutlined, CheckCircleTwoTone, PauseOutlined, EditOutlined,
-    PlusOutlined, CloseCircleTwoTone, MailTwoTone, MailFilled, MailOutlined,
+    PlusOutlined, CloseCircleTwoTone,
 } from '@ant-design/icons'
 import { get, put, post } from '../util/request'
-import { wechat as wechatApi, wechatall, wechatstatus, wechatmail } from '../util/api'
+import { wechat as wechatApi, wechatall, wechatstatus } from '../util/api'
 
 const WechatCardTitle = props => {
-    const { title, status, mail } = props
+    const { title, status } = props
     const color = status ? '#eb2f96' : '#52c41a'
-    const mailcolor = mail ? '#52c41a' : '#eb2f96'
     return (<div>
         <span>{title}</span>
         <span style={{ margin: 'auto 3px auto 10px' }}>
@@ -19,27 +18,16 @@ const WechatCardTitle = props => {
         <span style={{ fontSize: 12, color }}>
             {status ? '已禁用' : '已启用'}
         </span>
-        <span style={{ margin: 'auto 3px auto 10px' }}>
-            <MailTwoTone twoToneColor={mailcolor} />
-        </span>
-        <span style={{ fontSize: 12, color: mailcolor }}>
-            {mail ? '接收邮件' : '拒收邮件'}
-        </span>
     </div>)
 }
 
 const WechatCard = props => {
     const { wechat, editHandler } = props
     const [status, setStatus] = useState(wechat.del_on ? 1 : 0)
-    const [mail, setMail] = useState(wechat.mail ? 1 : 0)
 
     const statusSwitchHandler = () => {
         put(`${wechatstatus}/${wechat.id}`, { status: status ^ 1 })
             .then(data => { setStatus(data ? 1 : 0) })
-    }
-    const mailSwitchHandler = () => {
-        put(`${wechatmail}/${wechat.id}`, { mail: mail ^ 1 })
-            .then(data => { setMail(data ? 1 : 0) })
     }
 
     const WechatCheck = () => {
@@ -47,16 +35,13 @@ const WechatCard = props => {
         cardActions.push(status
             ? <CheckOutlined onClick={statusSwitchHandler} />
             : <PauseOutlined onClick={statusSwitchHandler} />)
-        cardActions.push(mail
-            ? <MailFilled onClick={mailSwitchHandler} />
-            : <MailOutlined onClick={mailSwitchHandler} />)
         return cardActions
     }
 
     return (
         <Card hoverable style={{ margin: '10px auto', width: 500, borderRadius: 3 }}
             actions={WechatCheck()}>
-            <Descriptions column={1} bordered size="small" title={<WechatCardTitle title={wechat.name} mail={mail} status={status} />}>
+            <Descriptions column={1} bordered size="small" title={<WechatCardTitle title={wechat.name} status={status} />}>
                 <Descriptions.Item label="微信号">{wechat.wechatname}</Descriptions.Item>
                 <Descriptions.Item label="AppID">{wechat.appid}</Descriptions.Item>
                 <Descriptions.Item label="AppSecret">{wechat.appsecret}</Descriptions.Item>
@@ -86,7 +71,6 @@ export default props => {
 
     const SubmitHandler = values => {
         const { id } = values
-        values.mail = values.mail ? 1 : 0
         setLoading(1)
         const req = id ? put(`${wechatApi}/${id}`, values) : post(wechatApi, values)
         req.then(data => {

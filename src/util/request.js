@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { host } from './api'
-import { authtoken } from './auth-storage';
 import codeHandler from './code-handler'
 import qs from 'qs'
 
@@ -19,7 +18,7 @@ InsRequest.interceptors.request.use(options => {
         ...options,
         headers: {
             ...options.headers,
-            Authorization: `Bearer ${authtoken()}`
+            Authorization: `Bearer ${process.env.REACT_APP_MOCK_TOKEN}`
         }
     }
 }, error => {

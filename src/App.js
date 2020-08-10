@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Layout, Menu, Avatar, Popover, Divider } from 'antd'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
+import { UserOutlined } from '@ant-design/icons'
 import { Route, Switch, Link, useLocation } from 'react-router-dom'
-import { root, login, reg, profile, article, fans, wechat, wxonline } from './router'
-import { nickname } from './util/auth-storage'
+import { root, profile, article, fans, wechat, wxonline } from './router'
+import { NicknameContext } from './util/context'
+import { auth } from './util/api'
+import { get } from './util/request'
 
 const { Header, Content } = Layout
 
@@ -13,14 +15,19 @@ const AvatarMenu = nickname => (
     <div className="AvatarNickName">Hi, {nickname}</div>
     <Divider className="AvatarDivider" />
     <Link className="AvatarMenu" to={profile.path}><UserOutlined /> My Profile</Link>
-    <Link className="AvatarMenu" style={{ color: '#e89191' }} to={login.path}><LogoutOutlined /> LOGOUT</Link>
   </>
 )
 
 const App = props => {
-  const nname = nickname() || 'O'
   let path = useLocation().pathname.toLowerCase()
-  if (path === login.path || path === reg.path) return (null)
+  const [nickname, setNickname] = useState('Login Please!')
+
+  useEffect(() => {
+    get(auth).then(data => {
+      const { nickname } = data || {}
+      nickname && setNickname(nickname)
+    })
+  }, [])
 
   return (
     <Layout className="Layout">
@@ -45,19 +52,21 @@ const App = props => {
             <Link to={wxonline.path}>公众号平台</Link>
           </Menu.Item>
         </Menu>
-        <Popover content={AvatarMenu(nname)} placement="bottomRight" trigger="hover">
+        <Popover content={AvatarMenu(nickname)} placement="bottomRight" trigger="hover">
           <Avatar className="Avatar" size="large">
-            {(nname[0] || 'O').toUpperCase()}
+            {(nickname[0]).toUpperCase()}
           </Avatar>
         </Popover>
       </Header>
-      <Content className="Content">
-        <Switch>
-          {
-            root.children.map((r, k) => (<Route exact key={k} path={r.path} component={r.component} />))
-          }
-        </Switch>
-      </Content>
+      <NicknameContext.Provider value={{ nickname, setNickname }}>
+        <Content className="Content">
+          <Switch>
+            {
+              root.children.map((r, k) => (<Route exact key={k} path={r.path} component={r.component} />))
+            }
+          </Switch>
+        </Content>
+      </NicknameContext.Provider>
     </Layout>
   )
 }
