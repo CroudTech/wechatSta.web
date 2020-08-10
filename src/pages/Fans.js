@@ -55,10 +55,27 @@ const columns = [
     },
 ]
 
+const chart = {
+    type: 'line',
+    title: {
+        新关注人数: '新关注人数',
+        搜索公众号名称: '公众号搜索',
+        扫描二维码: '扫描二维码',
+        图文页右上角菜单: '图文页右上角菜单',
+        名片分享: '名片分享',
+        其他来源: '其他合计',
+        取消关注人数: '取消关注人数',
+        净增关注人数: '净增关注人数',
+        累计关注人数: '累计关注人数',
+    },
+    filter:['累计关注人数'],
+    x: '日期',
+}
+
 export default props => {
     return (
         <div style={{ padding: '0 30px' }}>
-            <WechatSta sta="fans" columns={columns} dataapi={fans} xlsxapi={fansxlsx} />
+            <WechatSta sta="fans" chart={chart} columns={columns} dataapi={fans} xlsxapi={fansxlsx} />
         </div>
     )
 }

@@ -51,10 +51,24 @@ const columns = [
     },
 ]
 
+
+const chart = {
+    type: 'interval',
+    fields: {
+        阅读量: 'int_page_read_count',
+        分享次数: 'share_count',
+        留言数: 'comment_num',
+        好看数: 'like_num',
+        收藏数: 'add_to_fav_count',
+        全文阅读完成率: 'read_percent',
+    },
+    x: 'title',
+}
+
 export default props => {
     return (
         <div style={{ padding: '0 30px' }}>
-            <WechatSta sta="article" columns={columns} dataapi={article} xlsxapi={articlexlsx} />
+            <WechatSta sta="article" chart={chart} columns={columns} dataapi={article} xlsxapi={articlexlsx} />
         </div>
     )
 }
